@@ -27,3 +27,4 @@ jobs:
       with:
         report_name: Automation Test Run Report
         report_title: Regression
+        github_token: ${{ secrets.GITHUB_TOKEN }}
