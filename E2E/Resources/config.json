@@ -1,0 +1,29 @@
+{
+    "testConfig": {
+        "browser": "chrome",
+        "headlessMode": "Yes", //Yes -- Non GUI Mode, //No -- GUI Mode
+        "reportName": "Regression Report",
+        "suite": "Regression Suite",
+        "emailIDs": "balaji.november@gmail.com;",
+        "dbconnectionString": "",
+        "product": "E2E",
+        "author": "Balaji Gopi"
+    },
+
+    "appConfig": {
+        "webBaseURL": "https://www.saucedemo.com/",
+        "baseURL": "https://reqres.in/",
+        "socketType": "wss://",
+        "serviceFabricURL": ""
+    },
+
+    "dbConnectionString": {
+        "dataSource": "",
+        "userName": "",
+        "password" :  ""
+    },
+
+    "testData": {
+        "subnet": ""
+    }
+}

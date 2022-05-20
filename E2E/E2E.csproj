@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\DeleteRequest.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\GetRequest.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\InvalidConnection.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Login.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Logout.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\PatchRequest.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\PostRequest.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\PutRequest.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Register.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\SendMessage.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+    <PackageReference Include="Selenium.Support" Version="4.1.1" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.1.1" />
+    <PackageReference Include="SpecFlow.Plus.LivingDocPlugin" Version="3.9.57" />
+    <PackageReference Include="SpecFlow.NUnit" Version="3.9.40" />
+    <PackageReference Include="nunit" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.1.0" />
+    <PackageReference Include="FluentAssertions" Version="6.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoreAutomator\CoreAutomator.csproj" />
+    <ProjectReference Include="..\CoreNeonAutomator\CoreAutomator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
