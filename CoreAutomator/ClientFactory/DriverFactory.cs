@@ -3,6 +3,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.IE;
+using Protractor;
 using WebDriverManager.DriverConfigs.Impl;
 
 namespace CoreAutomator.ClientFactory
@@ -11,6 +12,8 @@ namespace CoreAutomator.ClientFactory
     {
         [ThreadStatic]
         protected static IWebDriver driver;
+        [ThreadStatic]
+        protected static NgWebDriver ngDriver;
 
         public void OpenBrowser(string browserName, string webBaseUrl, string headlessExecution)
         {

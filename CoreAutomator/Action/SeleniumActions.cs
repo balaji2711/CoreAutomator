@@ -31,105 +31,94 @@ namespace CoreAutomator.Action
 
         public IWebActions Find(Locator locator)
         {
-            switch (locator.Type)
-            {
-                case LocatorType.Id:
-                    FindElement(By.Id(locator.Value));
-                    break;
-
-                case LocatorType.Name:
-                    FindElement(By.Name(locator.Value));
-                    break;
-
-                case LocatorType.XPath:
-                    FindElement(By.XPath(locator.Value));
-                    break;
-
-                case LocatorType.LinkText:
-                    FindElement(By.LinkText(locator.Value));
-                    break;
-
-                case LocatorType.TagName:
-                    FindElement(By.TagName(locator.Value));
-                    break;
-
-                case LocatorType.CssSelector:
-                    FindElement(By.CssSelector(locator.Value));
-                    break;
-
-                case LocatorType.ClassName:
-                    FindElement(By.ClassName(locator.Value));
-                    break;
-
-                case LocatorType.PartialLinkText:
-                    FindElement(By.PartialLinkText(locator.Value));
-                    break;
-
-                default:
-                    throw new ArgumentException($"Locator Type not yet implemented - {locator.Type}");
-            }
+            _element = SwitchLocator(locator);
             return this;
         }
 
-        public IWebActions Find(Locator locator, int timeSpan)
-        {
-            switch (locator.Type)
-            {
-                case LocatorType.Id:
-                    FindElement(By.Id(locator.Value));
-                    WaitFor(10);
-                    break;
-
-                case LocatorType.Name:
-                    FindElement(By.Name(locator.Value));
-                    WaitFor(10);
-                    break;
-
-                case LocatorType.XPath:
-                    FindElement(By.XPath(locator.Value));
-                    WaitFor(10);
-                    break;
-
-                case LocatorType.LinkText:
-                    FindElement(By.LinkText(locator.Value));
-                    WaitFor(10);
-                    break;
-
-                case LocatorType.TagName:
-                    FindElement(By.TagName(locator.Value));
-                    WaitFor(10);
-                    break;
-
-                case LocatorType.CssSelector:
-                    FindElement(By.CssSelector(locator.Value));
-                    WaitFor(10);
-                    break;
-
-                case LocatorType.ClassName:
-                    FindElement(By.ClassName(locator.Value));
-                    WaitFor(10);
-                    break;
-
-                case LocatorType.PartialLinkText:
-                    FindElement(By.PartialLinkText(locator.Value));
-                    WaitFor(10);
-                    break;
-
-                default:
-                    throw new ArgumentException($"Locator Type not yet implemented - {locator.Type}");
-            }
-            return this;
-        }
-
-        private void FindElement(By by)
+        public IWebActions Find(Locator locator, int timeInSeconds)
         {
             try
             {
-                _element = driver.FindElement(by);
+                DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(driver);
+                fluentWait.Timeout = TimeSpan.FromSeconds(timeInSeconds);
+                fluentWait.PollingInterval = TimeSpan.FromSeconds(2);
+                fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(TimeoutException), typeof(StaleElementReferenceException));
+                fluentWait.Message = "Element to be searched not found";
+                fluentWait.Until(new Func<IWebDriver, bool>((IWebDriver fluentDriver) =>
+                {
+                    try
+                    {
+                        _element = SwitchLocator(locator);
+                        if (_element.Displayed)
+                            return true;
+                    }
+                    catch (Exception)
+                    {
+                        _element = null;
+                    }
+                    return false;
+                }));
+            }
+            catch (ElementNotInteractableException)
+            {
+            }
+            return this;
+        }
+
+        private IWebElement SwitchLocator(Locator locator)
+        {
+            IWebElement element = null;
+            switch (locator.Type)
+            {
+                case LocatorType.Id:
+                    element = FindElement(By.Id(locator.Value));
+                    break;
+
+                case LocatorType.Name:
+                    element = FindElement(By.Name(locator.Value));
+                    break;
+
+                case LocatorType.XPath:
+                    element = FindElement(By.XPath(locator.Value));
+                    break;
+
+                case LocatorType.LinkText:
+                    element = FindElement(By.LinkText(locator.Value));
+                    break;
+
+                case LocatorType.TagName:
+                    element = FindElement(By.TagName(locator.Value));
+                    break;
+
+                case LocatorType.CssSelector:
+                    element = FindElement(By.CssSelector(locator.Value));
+                    break;
+
+                case LocatorType.ClassName:
+                    element = FindElement(By.ClassName(locator.Value));
+                    break;
+
+                case LocatorType.PartialLinkText:
+                    element = FindElement(By.PartialLinkText(locator.Value));
+                    break;
+
+                default:
+                    throw new ArgumentException($"Locator Type not yet implemented - {locator.Type}");
+            }
+            return element;
+        }
+
+        private IWebElement FindElement(By by)
+        {
+            IWebElement element = null;
+            try
+            {
+                element = driver.FindElement(by);
             }
             catch (NoSuchElementException)
             {
             }
+            return element;
         }
 
         public IWebActions Clear()
@@ -305,7 +294,7 @@ namespace CoreAutomator.Action
             try
             {
                 text = (string)((IJavaScriptExecutor)driver).ExecuteScript("return arguments[0].innerHTML;", _element);
-                text = text.Replace(Environment.NewLine, string.Empty);
+                text = text.Replace(System.Environment.NewLine, string.Empty);
             }
             catch (Exception ex)
             {
@@ -337,7 +326,7 @@ namespace CoreAutomator.Action
                 javaScriptExecutor.ExecuteScript("window.open();");
                 int count = GetOpenWindowCount();
                 if (count >= 1)
-                    SwitchToNewWindow();
+                    this.SwitchToNewWindow();
                 string script = "window.location =\'" + url + "\'";
                 javaScriptExecutor.ExecuteScript(script);
                 flag = true;
@@ -354,7 +343,7 @@ namespace CoreAutomator.Action
             try
             {
                 driver.Navigate().GoToUrl(url);
-                WaitForSeconds(2);
+                WaitFor(2);
             }
             catch (Exception ex)
             {
@@ -403,8 +392,8 @@ namespace CoreAutomator.Action
             try
             {
                 string currentWindowHandler = driver.CurrentWindowHandle;
-                WaitForSeconds(2);
-                List<string> windows = driver.WindowHandles.ToList();
+                WaitFor(2);
+                List<string> windows = driver.WindowHandles.ToList<string>();
                 windows.ForEach(t =>
                 {
                     if (!t.Equals(currentWindowHandler))
@@ -422,9 +411,9 @@ namespace CoreAutomator.Action
             return this;
         }
 
-        public IWebActions WaitForSeconds(int seconds)
+        public IWebActions WaitFor(int timeInSeconds)
         {
-            Thread.Sleep(seconds * 1000);
+            Thread.Sleep(timeInSeconds * 1000);
             return this;
         }
 
@@ -490,7 +479,7 @@ namespace CoreAutomator.Action
             {
                 javaScriptExecutor = (IJavaScriptExecutor)driver;
                 javaScriptExecutor.ExecuteScript("window.scrollTo(0, 0);");
-                WaitForSeconds(2);
+                this.WaitFor(2);
             }
             catch (Exception ex)
             {
@@ -589,13 +578,13 @@ namespace CoreAutomator.Action
             d => ((IJavaScriptExecutor)d).ExecuteScript("return document.readyState").Equals("complete"));
         }
 
-        public IWebActions WaitForEnabled(int timeSpan)
+        public IWebActions WaitForEnabled(int timeInSeconds)
         {
             try
             {
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                while (watch.Elapsed.Milliseconds < timeSpan)
+                while (watch.Elapsed.Milliseconds < timeInSeconds)
                 {
                     if (_element.Enabled)
                         break;
@@ -607,40 +596,17 @@ namespace CoreAutomator.Action
             return this;
         }
 
-        public IWebActions WaitForVisible(int timeSpan)
+        public IWebActions WaitForVisible(int timeInSeconds)
         {
             try
             {
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                while (watch.Elapsed.Milliseconds < timeSpan)
+                while (watch.Elapsed.Milliseconds < timeInSeconds)
                 {
                     if (_element.Displayed)
                         break;
                 }
-            }
-            catch (ElementNotInteractableException)
-            {
-            }
-            return this;
-        }
-
-        public IWebActions WaitFor(int timeSpan)
-        {
-            try
-            {
-                DefaultWait<IWebElement> fluentWait = new DefaultWait<IWebElement>(_element);
-                fluentWait.Timeout = TimeSpan.FromSeconds(timeSpan);
-                fluentWait.PollingInterval = TimeSpan.FromMilliseconds(250);
-                fluentWait.Message = "Element to be searched not found";
-                Func<IWebElement, bool> elementVisible = new Func<IWebElement, bool>((ele) =>
-                {
-                    if (ele.Displayed)
-                        return true;
-                    else
-                        return false;
-                });
-                fluentWait.Until(elementVisible);
             }
             catch (ElementNotInteractableException)
             {
@@ -668,7 +634,7 @@ namespace CoreAutomator.Action
             bool sorted = true;
             for (int i = 1; i < list.Count(); i++)
             {
-                if (list[i - 1] >= list[i])
+                if ((list[i - 1] >= (list[i])))
                     sorted = true;
                 else
                 {
@@ -684,7 +650,7 @@ namespace CoreAutomator.Action
             bool sorted = true;
             for (int i = 1; i < list.Count(); i++)
             {
-                if (list[i - 1] <= list[i])
+                if ((list[i - 1] <= (list[i])))
                     sorted = true;
                 else
                 {
@@ -729,9 +695,48 @@ namespace CoreAutomator.Action
             return MediaEntityBuilder.CreateScreenCaptureFromBase64String(screenshot, name).Build();
         }
 
+        public IWebActions WaitForUrl(Locator locator, int timeInSeconds, string searchText)
+        {
+            try
+            {
+                DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(driver);
+                fluentWait.Timeout = TimeSpan.FromSeconds(timeInSeconds);
+                fluentWait.PollingInterval = TimeSpan.FromSeconds(2);
+                fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(TimeoutException), typeof(StaleElementReferenceException));
+                fluentWait.Message = "Element to be searched not found";
+                fluentWait.Until(new Func<IWebDriver, bool>((IWebDriver fluentDriver) =>
+                {
+                    try
+                    {
+                        if (fluentDriver.Url.Contains(searchText))
+                            return true;
+                    }
+                    catch (Exception)
+                    { }
+                    return false;
+                }));
+            }
+            catch (ElementNotInteractableException)
+            {
+            }
+            return this;
+        }
+
+        public IWebActions WaitForAngularRequestToFinish()
+        {
+            ngDriver.WaitForAngular();
+            return this;
+        }
+
+        public IWebActions Refresh()
+        {
+            driver.Navigate().Refresh();
+            return this;
+        }
+
         public void CloseBrowser()
         {
-            QuitBrowser();
+            base.QuitBrowser();
         }
 
         public IWebActions OpenBrowser(string browserName, string webBaseUrl, string headlessExecution)

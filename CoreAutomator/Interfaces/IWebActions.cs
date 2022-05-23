@@ -14,7 +14,9 @@ namespace CoreAutomator.Interfaces
         IWebActions DoubleClick();
         void DownloadImageFile(string imageUrl, string imageName, string path);
         IWebActions Find(Locator locator);
-        IWebActions Find(Locator locator, int timeSpan);
+        IWebActions Find(Locator locator, int timeInSeconds);
+
+        IWebActions WaitForUrl(Locator locator, int timeInSeconds, string searchText);
         string GetAttribute(string type);
         string GetCssValue();
         string GetCurrentURL();
@@ -42,11 +44,12 @@ namespace CoreAutomator.Interfaces
         IWebActions SwitchToParentFrame();
         IWebActions SwitchToWindowByTitle(string titleOfCurrentWindow);
         IWebActions Type(string value);
-        IWebActions WaitFor(int timeSpan);
-        IWebActions WaitForEnabled(int timeSpan);
+        IWebActions WaitForEnabled(int timeInSeconds);
         void WaitForPageLoad();
-        IWebActions WaitForSeconds(int seconds);
-        IWebActions WaitForVisible(int timeSpan);
+        IWebActions WaitFor(int timeInSeconds);
+        IWebActions WaitForVisible(int timeInSeconds);
+        IWebActions WaitForAngularRequestToFinish();
+        IWebActions Refresh();
         void CloseBrowser();
         IWebActions OpenBrowser(string browserName, string webBaseUrl, string headlessExecution);
     }

@@ -48,7 +48,7 @@ namespace E2E.Pages
             string? text = null;
             try
             {
-                text = iWebActions.Find(title).WaitForVisible(10).GetText();
+                text = iWebActions.Find(title,10).GetText();
                 if (text != null)
                 {
                     Assert.Multiple(() =>
