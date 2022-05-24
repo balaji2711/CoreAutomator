@@ -15,7 +15,7 @@ namespace E2E.StepDefinitions.E2E
         HttpStatusCode statuscode;
         private int _numericResponse = 0;
         RestActions restActions;
-        string baseUrl = Environment.GetEnvironmentVariable("BaseUrl") ?? Utils.RestBaseUrl();
+        string baseUrl = System.Environment.GetEnvironmentVariable("BaseUrl") ?? Utils.RestBaseUrl();
 
         public RestSteps()
         {
@@ -26,7 +26,7 @@ namespace E2E.StepDefinitions.E2E
         [When(@"I run the user request API")]
         public void WhenIRunTheUserRequestAPI()
         {
-            restRequest = restActions.Get("api/users?page=2");
+            restRequest = restActions.SetRequest(Method.GET, "api/users?page=2").Send();
             restResponse = restActions.Execute(restRequest);
             statuscode = restResponse.StatusCode;
             _numericResponse = (int)statuscode;
@@ -49,7 +49,10 @@ namespace E2E.StepDefinitions.E2E
         [When(@"I run the post call")]
         public void WhenIRunThePostCall()
         {
-            restRequest = restActions.Post("api/users", "{\"name\":\"morpheus\",\"job\":\"leader\"}");
+            restRequest = restActions.SetRequest(Method.POST, "api/users")
+                                     .SetContentType(ContentType.JSON)
+                                     .Body(@"{""name"":""morpheus"",""job"":""leader""}")
+                                     .Send();
             restResponse = restActions.Execute(restRequest);
             statuscode = restResponse.StatusCode;
             _numericResponse = (int)statuscode;
@@ -73,7 +76,10 @@ namespace E2E.StepDefinitions.E2E
         [When(@"I run the put call")]
         public void WhenIRunThePutCall()
         {
-            restRequest = restActions.Put("api/users/2", "{\"name\":\"morpheus\",\"job\":\"zionresident\"}");
+            restRequest = restActions.SetRequest(Method.PUT, "api/users/2")
+                                     .SetContentType(ContentType.JSON)
+                                     .Body(@"{""name"":""morpheus"",""job"":""zionresident""}")
+                                     .Send();
             restResponse = restActions.Execute(restRequest);
             statuscode = restResponse.StatusCode;
             _numericResponse = (int)statuscode;
@@ -97,7 +103,10 @@ namespace E2E.StepDefinitions.E2E
         [When(@"I run the patch call")]
         public void WhenIRunThePatchCall()
         {
-            restRequest = restActions.Patch("api/users/2", "{\"name\":\"morpheus\",\"job\":\"zionresident\"}");
+            restRequest = restActions.SetRequest(Method.PATCH, "api/users/2")
+                                     .SetContentType(ContentType.JSON)
+                                     .Body(@"{""name"":""morpheus"",""job"":""zionresident""}")
+                                     .Send();
             restResponse = restActions.Execute(restRequest);
             statuscode = restResponse.StatusCode;
             _numericResponse = (int)statuscode;
@@ -121,7 +130,7 @@ namespace E2E.StepDefinitions.E2E
         [When(@"I run the delete call")]
         public void WhenIRunTheDeleteCall()
         {
-            restRequest = restActions.Delete("api/users/2");
+            restRequest = restActions.SetRequest(Method.DELETE, "api/users/2").Send();
             restResponse = restActions.Execute(restRequest);
             statuscode = restResponse.StatusCode;
             _numericResponse = (int)statuscode;

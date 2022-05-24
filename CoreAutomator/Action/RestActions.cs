@@ -5,52 +5,74 @@ using System.Net;
 
 namespace CoreAutomator.Action
 {
+    public enum ContentType
+    {
+        TEXT,
+        JSON,
+        XML,
+        NONE
+    }
+
     public class RestActions
     {
         [ThreadStatic]
         public IRestClient? restClient;
-        public IRestRequest? _restRequest;
+        private IRestRequest? _restRequest;
+        private string _url;
+        private ContentType _contentType = ContentType.NONE;
+
+        public IRestRequest Send()
+        {
+            return _restRequest;
+        }
+
+        public RestActions SetRequest(Method method, string path)
+        {
+            _url = path;
+            _restRequest = new RestRequest(_url, method);
+            return this;
+        }
+
+        public RestActions AddHeader(string name, string value)
+        {
+            _restRequest.AddHeader(name, value);
+            return this;
+        }
+
+        public RestActions SetContentType(ContentType contentType)
+        {
+            string contentTypeStr = GetContentType(contentType);
+            if (contentTypeStr != "none")
+            {
+                _contentType = contentType;
+                AddHeader("Accept", contentTypeStr);
+                AddHeader("Content-Type", contentTypeStr);
+            }
+            return this;
+        }
+
+        private string GetContentType(ContentType contentType)
+        {
+            switch (contentType)
+            {
+                case ContentType.TEXT: return "text/plain";
+                case ContentType.JSON: return "application/json";
+                case ContentType.XML: return "application/xml";
+                default: return "none";
+            }
+        }
 
         public void OpenRestClient(string baseURL)
         {
             restClient = new RestClient(baseURL);
         }
 
-        public IRestRequest Get(string endPoint, string? accessToken = null)
+        public RestActions Body(string requestBody)
         {
-            _restRequest = new RestRequest(endPoint, Method.GET);
-            _restRequest.AddHeader("Accept", "application/json");
-            _restRequest.AddHeader("Authorization", "Bearer " + accessToken);
-            ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
-            return _restRequest;
-        }
-
-        public IRestRequest Post(string endPoint, string requestBody)
-        {
-            _restRequest = new RestRequest(endPoint, Method.POST);
-            _restRequest.AddHeader("Accept", "application/json");
             _restRequest.Parameters.Clear();
-            _restRequest.AddParameter("application/json", requestBody, ParameterType.RequestBody);
+            _restRequest.AddParameter(GetContentType(_contentType), requestBody, ParameterType.RequestBody);
             ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
-            return _restRequest;
-        }
-
-        public IRestRequest Put(string endPoint, string requestBody)
-        {
-            _restRequest = new RestRequest(endPoint, Method.PUT);
-            _restRequest.AddHeader("Accept", "application/json");
-            _restRequest.AddParameter("application/json", requestBody, ParameterType.RequestBody);
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            return _restRequest;
-        }
-
-        public IRestRequest Patch(string endPoint, string requestBody)
-        {
-            _restRequest = new RestRequest(endPoint, Method.PATCH);
-            _restRequest.AddHeader("Accept", "application/json");
-            _restRequest.AddParameter("application/json", requestBody, ParameterType.RequestBody);
-            return _restRequest;
+            return this;
         }
 
         public IRestRequest Delete(string endPoint)
@@ -74,9 +96,9 @@ namespace CoreAutomator.Action
             return numericResponse >= statusCodeOk && numericResponse < statusCodeBadRequest;
         }
 
-        public static Dictionary<string, object> DeserializeResponse(IRestResponse restResponse)
+        public static Dictionary<string, Object> DeserializeResponse(IRestResponse restResponse)
         {
-            var jsonObj = new JsonDeserializer().Deserialize<Dictionary<string, object>>(restResponse);
+            var jsonObj = new JsonDeserializer().Deserialize<Dictionary<string, Object>>(restResponse);
             return jsonObj;
         }
 
