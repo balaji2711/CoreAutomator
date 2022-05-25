@@ -8,11 +8,13 @@ on:
         
 jobs:
   build:
-    runs-on: windows-latest
-
+    runs-on: windows-latest        
+    
     steps:
-    - uses: browser-actions/setup-chrome@latest
-    - run: chrome --version
+    - name: setup-chromedriver
+      uses: nanasess/setup-chromedriver@v1.0.7
+      with:
+        chromedriver-version: 102  
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
