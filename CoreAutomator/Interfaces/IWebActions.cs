@@ -16,7 +16,9 @@ namespace CoreAutomator.Interfaces
         IWebActions Find(Locator locator);
         IWebActions Find(Locator locator, int timeInSeconds);
 
-        IWebActions WaitForUrl(Locator locator, int timeInSeconds, string searchText);
+        IWebActions WaitForUrl(int timeInSeconds, string searchText);
+        IWebActions WaitForTitle(int timeInSeconds, string searchText, bool matchExact = false);
+        IWebActions WaitForText(Locator locator, int timeInSeconds, string searchText, bool matchExact = false);
         string GetAttribute(string type);
         string GetCssValue();
         string GetCurrentURL();

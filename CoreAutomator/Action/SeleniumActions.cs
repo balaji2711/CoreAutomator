@@ -31,17 +31,21 @@ namespace CoreAutomator.Action
 
         public IWebActions Find(Locator locator)
         {
+            _element = null;
             _element = SwitchLocator(locator);
+            if (_element == null)
+                Assert.Fail("Can't find locator - " + locator.Value);
             return this;
         }
 
         public IWebActions Find(Locator locator, int timeInSeconds)
         {
+            _element = null;
             try
             {
                 DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(driver);
                 fluentWait.Timeout = TimeSpan.FromSeconds(timeInSeconds);
-                fluentWait.PollingInterval = TimeSpan.FromSeconds(2);
+                fluentWait.PollingInterval = TimeSpan.FromSeconds(5);
                 fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(TimeoutException), typeof(StaleElementReferenceException));
                 fluentWait.Message = "Element to be searched not found";
                 fluentWait.Until(new Func<IWebDriver, bool>((IWebDriver fluentDriver) =>
@@ -59,9 +63,9 @@ namespace CoreAutomator.Action
                     return false;
                 }));
             }
-            catch (ElementNotInteractableException)
-            {
-            }
+            catch (Exception) { }
+            if (_element == null)
+                Assert.Fail("Can't find locator - " + locator.Value);
             return this;
         }
 
@@ -103,7 +107,8 @@ namespace CoreAutomator.Action
                     break;
 
                 default:
-                    throw new ArgumentException($"Locator Type not yet implemented - {locator.Type}");
+                    Assert.Fail($"Locator Type not yet implemented - {locator.Type}");
+                    break;
             }
             return element;
         }
@@ -115,10 +120,87 @@ namespace CoreAutomator.Action
             {
                 element = driver.FindElement(by);
             }
-            catch (NoSuchElementException)
-            {
-            }
+            catch (Exception) { }
             return element;
+        }
+
+        public IWebActions WaitForUrl(int timeInSeconds, string searchText)
+        {
+            try
+            {
+                DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(driver);
+                fluentWait.Timeout = TimeSpan.FromSeconds(timeInSeconds);
+                fluentWait.PollingInterval = TimeSpan.FromSeconds(5);
+                fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(TimeoutException), typeof(StaleElementReferenceException));
+                fluentWait.Message = "Search text is not found in Url";
+                fluentWait.Until(new Func<IWebDriver, bool>((fluentDriver) =>
+                {
+                    try
+                    {
+                        return fluentDriver.Url.ToLowerInvariant().Contains(searchText.ToLowerInvariant());
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }));
+            }
+            catch (Exception) { }
+            return this;
+        }
+
+        public IWebActions WaitForTitle(int timeInSeconds, string title, bool matchExact = false)
+        {
+            try
+            {
+                DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(driver);
+                fluentWait.Timeout = TimeSpan.FromSeconds(timeInSeconds);
+                fluentWait.PollingInterval = TimeSpan.FromSeconds(5);
+                fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(TimeoutException), typeof(StaleElementReferenceException));
+                fluentWait.Message = "Title is not found";
+                fluentWait.Until(new Func<IWebDriver, bool>((fluentDriver) =>
+                {
+                    try
+                    {
+                        var currentTitle = fluentDriver.Title.ToLowerInvariant();
+                        return matchExact ? currentTitle.Equals(title.ToLowerInvariant()) : currentTitle.Contains(title.ToLowerInvariant());
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }));
+            }
+            catch (Exception) { }
+            return this;
+        }
+
+        public IWebActions WaitForText(Locator locator, int timeInSeconds, string searchText, bool matchExact = false)
+        {
+            try
+            {
+                DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(driver);
+                fluentWait.Timeout = TimeSpan.FromSeconds(timeInSeconds);
+                fluentWait.PollingInterval = TimeSpan.FromSeconds(5);
+                fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(TimeoutException), typeof(StaleElementReferenceException));
+                fluentWait.Message = "Given text is not found";
+                fluentWait.Until(new Func<IWebDriver, bool>((fluentDriver) =>
+                {
+                    try
+                    {
+                        _element = SwitchLocator(locator);
+                        var currentText = _element.Text.ToLowerInvariant();
+                        return matchExact ? currentText.Equals(searchText.ToLowerInvariant()) : currentText.Contains(searchText.ToLowerInvariant());
+                    }
+                    catch (Exception)
+                    {
+                        _element = null;
+                    }
+                    return false;
+                }));
+            }
+            catch (Exception) { }
+            return this;
         }
 
         public IWebActions Clear()
@@ -693,33 +775,6 @@ namespace CoreAutomator.Action
         {
             var screenshot = ((ITakesScreenshot)driver).GetScreenshot().AsBase64EncodedString;
             return MediaEntityBuilder.CreateScreenCaptureFromBase64String(screenshot, name).Build();
-        }
-
-        public IWebActions WaitForUrl(Locator locator, int timeInSeconds, string searchText)
-        {
-            try
-            {
-                DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(driver);
-                fluentWait.Timeout = TimeSpan.FromSeconds(timeInSeconds);
-                fluentWait.PollingInterval = TimeSpan.FromSeconds(2);
-                fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(TimeoutException), typeof(StaleElementReferenceException));
-                fluentWait.Message = "Element to be searched not found";
-                fluentWait.Until(new Func<IWebDriver, bool>((IWebDriver fluentDriver) =>
-                {
-                    try
-                    {
-                        if (fluentDriver.Url.Contains(searchText))
-                            return true;
-                    }
-                    catch (Exception)
-                    { }
-                    return false;
-                }));
-            }
-            catch (ElementNotInteractableException)
-            {
-            }
-            return this;
         }
 
         public IWebActions WaitForAngularRequestToFinish()
