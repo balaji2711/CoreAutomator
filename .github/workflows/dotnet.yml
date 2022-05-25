@@ -11,10 +11,11 @@ jobs:
     runs-on: windows-latest        
     
     steps:
-    - name: setup-chromedriver
-      uses: nanasess/setup-chromedriver@v1.0.7
+    - uses: actions/checkout@v2
+    - uses: nanasess/setup-chromedriver@v1
       with:
-        chromedriver-version: 102  
+        chromedriver-version: '102.0.5005.63'
+    - run: chromedriver --url-base=/wd/hub &
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
