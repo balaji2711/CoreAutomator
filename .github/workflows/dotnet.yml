@@ -13,7 +13,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: nanasess/setup-chromedriver@v1
       with:
-        chromedriver-version: ''
+        chromedriver-version: '102.0.5005.63'
     - run: chromedriver --url-base=/wd/hub &
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
