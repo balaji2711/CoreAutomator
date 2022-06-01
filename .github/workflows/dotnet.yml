@@ -9,14 +9,11 @@ jobs:
   build:
     runs-on: windows-latest        
     steps:
-    - uses: nanasess/setup-chromedriver@v1
-      with:   
-        chromedriver-version: '88.0.4324.96'
-    - run: |
-        export DISPLAY=:99
-        chromedriver --url-base=/wd/hub &
-        sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
     - uses: actions/checkout@v3    
+    - uses: nanasess/setup-chromedriver@v1
+      with:
+        chromedriver-version: '102.0.5005.63'
+    - run: chromedriver --url-base=/wd/hub &    
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
