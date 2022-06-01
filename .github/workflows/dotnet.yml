@@ -11,8 +11,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: browser-actions/setup-chrome@latest
-      with:
-        chrome-version: beta
     - run: chrome --version   
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
