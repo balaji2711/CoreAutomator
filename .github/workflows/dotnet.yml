@@ -7,13 +7,13 @@ on:
         
 jobs:
   build:
-    runs-on: windows-latest        
+    runs-on: windows-latest    
     steps:
-    - uses: actions/checkout@v3    
-    - uses: nanasess/setup-chromedriver@v1
+    - uses: actions/checkout@v3
+    - uses: browser-actions/setup-chrome@latest
       with:
-        chromedriver-version: '102.0.5005.63'
-    - run: chromedriver --url-base=/wd/hub &    
+        chrome-version: beta
+    - run: chrome --version   
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
