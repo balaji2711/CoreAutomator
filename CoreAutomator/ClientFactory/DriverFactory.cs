@@ -4,7 +4,6 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.IE;
 using Protractor;
-using WebDriverManager.DriverConfigs.Impl;
 
 namespace CoreAutomator.ClientFactory
 {
@@ -26,7 +25,7 @@ namespace CoreAutomator.ClientFactory
                     chromeOptions.AddArguments("--ignore-certificate-errors");
                     if (headlessExecution == "Yes")
                         chromeOptions.AddArguments("--headless");
-                    new WebDriverManager.DriverManager().SetUpDriver(new ChromeConfig());
+                    //new WebDriverManager.DriverManager().SetUpDriver(new ChromeConfig());
                     driver = new ChromeDriver(chromeOptions);
                     driver.Manage().Cookies.DeleteAllCookies();
                     break;
@@ -35,14 +34,14 @@ namespace CoreAutomator.ClientFactory
                     var firefoxOptions = new FirefoxOptions();
                     if (headlessExecution == "Yes")
                         firefoxOptions.AddArguments("--headless");
-                    new WebDriverManager.DriverManager().SetUpDriver(new FirefoxConfig());
+                    //new WebDriverManager.DriverManager().SetUpDriver(new FirefoxConfig());
                     driver = new FirefoxDriver(firefoxOptions);
                     driver.Manage().Cookies.DeleteAllCookies();
                     driver.Manage().Window.Maximize();
                     break;
 
                 case "edge":
-                    new WebDriverManager.DriverManager().SetUpDriver(new EdgeConfig());
+                    //new WebDriverManager.DriverManager().SetUpDriver(new EdgeConfig());
                     driver = new EdgeDriver();
                     driver.Manage().Cookies.DeleteAllCookies();
                     driver.Manage().Window.Maximize();
@@ -52,7 +51,7 @@ namespace CoreAutomator.ClientFactory
                     var ieOptions = new InternetExplorerOptions();
                     ieOptions.IntroduceInstabilityByIgnoringProtectedModeSettings = true;
                     ieOptions.IgnoreZoomLevel = true;
-                    new WebDriverManager.DriverManager().SetUpDriver(new InternetExplorerConfig());
+                    //new WebDriverManager.DriverManager().SetUpDriver(new InternetExplorerConfig());
                     driver = new InternetExplorerDriver(ieOptions);
                     driver.Manage().Cookies.DeleteAllCookies();
                     driver.Manage().Window.Maximize();
